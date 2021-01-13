@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image classification using MobileNet and p5.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.js"></script>
+    <script language="javascript" type="text/javascript" src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+</head>
+
+<body>
+    <script>
+        let classifier;
+        let img;
+        let input;
+        let select=false;
+
+        function preload() {
+            classifier = ml5.imageClassifier('MobileNet');
+        }
+
+        function setup() {
+            createCanvas(1200, 400);
+
+            input = createFileInput(handleFile);
+            input.position(0, 410);
+        }
+        
+        function draw() {
+            if (select) {
+                clear();
+                
+                image(img, 0, 0, 400, 400);
+                
+                classifier.classify(img, gotResult);
+                
+                select=false;
+            }
+        }
+
+        function gotResult(error, results) {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log(results);
+
+                fill(50);
+                noStroke();
+                textSize(16);
+                text(`${results[0].label} - ${nf(results[0].confidence, 0, 2)}`, 410, 20);
+                text(`${results[1].label} - ${nf(results[1].confidence, 0, 2)}`, 410, 40);
+                text(`${results[2].label} - ${nf(results[2].confidence, 0, 2)}`, 410, 60);
+            }
+        }
+
+        function handleFile(file) {
+            if (file.type === 'image') {
+                img = createImg(file.data, '');
+                img.hide();
+                
+                select=true;
+            } else {
+                img = null;
+            }
+        }
+    </script>
+</body></html>
